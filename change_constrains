@@ -1,0 +1,19 @@
+ALTER TABLE order_ingredient
+DROP CONSTRAINT order_ingredient_order_id_fkey;
+
+ALTER TABLE order_ingredient
+DROP CONSTRAINT order_ingredient_ingredient_id_fkey;
+
+ALTER TABLE ingredient
+DROP CONSTRAINT ingredient_supplier_id_fkey;
+
+ALTER TABLE "order"
+DROP CONSTRAINT order_customer_id_fkey;
+
+ALTER TABLE order_ingredient ADD CONSTRAINT order_ingredient_order_id_fkey FOREIGN KEY (order_id) REFERENCES "order" (order_id);
+
+ALTER TABLE order_ingredient ADD CONSTRAINT order_ingredient_ingredient_id_fkey FOREIGN KEY (ingredient_id) REFERENCES ingredient (ingredient_id);
+
+ALTER TABLE ingredient ADD CONSTRAINT ingredient_supplier_id_fkey FOREIGN KEY (supplier_id) REFERENCES supplier (supplier_id);
+
+ALTER TABLE "order" ADD CONSTRAINT order_customer_id_fkey FOREIGN KEY (customer_id) REFERENCES customer (customer_id);
