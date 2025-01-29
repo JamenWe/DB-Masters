@@ -1,23 +1,17 @@
 package org.dbm.krautundrueben
 
-import org.dbm.krautundrueben.domain.nutrionalCategory.NutritionalCategoryRepository
 import org.springframework.boot.CommandLineRunner
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.runApplication
 import org.springframework.context.annotation.Bean
-import org.springframework.data.jpa.repository.config.EnableJpaAuditing
 import org.springframework.stereotype.Component
 import javax.sql.DataSource
 
 @SpringBootApplication
-class DbMastersApplication(
-    private val nutritionalCategoryRepository: NutritionalCategoryRepository
-) : CommandLineRunner {
+class DbMastersApplication : CommandLineRunner {
 
     override fun run(vararg args: String?) {
-        /*nutritionalCategoryRepository.findAll().forEach { category ->
-            println(category.toString())
-        }*/
+
     }
 }
 
