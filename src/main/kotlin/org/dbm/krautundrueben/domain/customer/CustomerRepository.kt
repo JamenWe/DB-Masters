@@ -1,8 +1,8 @@
-package org.dbm.krautundrueben.domain.nutrionalCategory
+package org.dbm.krautundrueben.domain.customer
 
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor
 import org.springframework.stereotype.Repository
 
 @Repository
-interface NutritionalCategoryRepository : JpaRepository<NutritionalCategoryEntity, Int>, JpaSpecificationExecutor<NutritionalCategoryEntity>
+interface CustomerRepository : JpaRepository<CustomerEntity, Int>, JpaSpecificationExecutor<CustomerEntity>

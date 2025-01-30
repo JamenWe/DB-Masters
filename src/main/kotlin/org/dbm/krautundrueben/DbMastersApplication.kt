@@ -1,5 +1,6 @@
 package org.dbm.krautundrueben
 
+import org.dbm.krautundrueben.domain.customer.CustomerRepository
 import org.springframework.boot.CommandLineRunner
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.runApplication
@@ -8,15 +9,24 @@ import org.springframework.stereotype.Component
 import javax.sql.DataSource
 
 @SpringBootApplication
-class DbMastersApplication : CommandLineRunner {
-
-    override fun run(vararg args: String?) {
-
-    }
-}
+class DbMastersApplication
 
 fun main(args: Array<String>) {
     runApplication<DbMastersApplication>(*args)
+}
+
+@Component
+class DataPrinterRunner(
+    private val customerRepository: CustomerRepository
+) : CommandLineRunner {
+
+    override fun run(vararg args: String?) {
+        println("Fetching all customers from the database:")
+        val customers = customerRepository.findAll()
+        customers.forEach { customer ->
+            println("${customer.id}: ${customer.firstName} ${customer.lastName}")
+        }
+    }
 }
 
 @Component
