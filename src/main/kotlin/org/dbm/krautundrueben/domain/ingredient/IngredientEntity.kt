@@ -11,7 +11,7 @@ class IngredientEntity (
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "ingredient_id", nullable = false, updatable = false)
-    val id: Int?,
+    val id: Int,
 
     @Column(name = "ingredient_name", nullable = false, length = 50)
     val name: String,
