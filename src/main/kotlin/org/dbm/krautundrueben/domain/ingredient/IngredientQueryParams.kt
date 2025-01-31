@@ -7,6 +7,7 @@ import java.math.BigDecimal
 
 data class IngredientQueryParams(
     val id: Int?,
+    val name: String?,
     val unit: String?,
     val netPrice: BigDecimal?,
     val stock: Int?,
