@@ -10,33 +10,33 @@ class CustomerEntity (
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "customer_id", nullable = false, updatable = false)
-    val id: Int,
+    val id: Int = 0,
 
     @Column(name = "last_name", nullable = false, length = 50)
-    val lastName: String,
+    var lastName: String,
 
     @Column(name = "first_name", nullable = false, length = 50)
-    val firstName: String,
+    var firstName: String,
 
     @Column(name = "date_of_birth")
-    val dateOfBirth: LocalDate?,
+    var dateOfBirth: LocalDate?,
 
     @Column(name = "street", length = 50)
-    val street: String?,
+    var street: String?,
 
     @Column(name = "house_number", length = 6)
-    val houseNumber: String?,
+    var houseNumber: String?,
 
     @Column(name = "zip_code", length = 5)
-    val zipCode: String?,
+    var zipCode: String?,
 
     @Column(name = "city", length = 50)
-    val city: String?,
+    var city: String?,
 
     @Column(name = "phone", length = 25)
-    val phone: String?,
+    var phone: String?,
 
     @Column(name = "email", length = 50)
-    val email: String?
+    var email: String?
 
 )
