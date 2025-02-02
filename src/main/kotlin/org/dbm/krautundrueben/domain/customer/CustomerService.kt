@@ -157,27 +157,27 @@ class CustomerService(
     private fun zipCodeEquals(zipCode: String): Specification<CustomerEntity> {
         return Specification { root, _, builder ->
             val customerZipCode = builder.lower(root.get(CustomerEntity_.zipCode))
-            builder.like(customerZipCode, zipCode)
+            builder.like(customerZipCode, "%${zipCode.lowercase()}%")
         }
     }
 
     private fun cityLike(city: String): Specification<CustomerEntity> {
         return Specification { root, _, builder ->
-            val customerCity = builder.lower(root.get(CustomerEntity_.CITY))
+            val customerCity = builder.lower(root.get(CustomerEntity_.city))
             builder.like(customerCity, "%${city.lowercase()}%")
         }
     }
 
     private fun phoneLike(phone: String): Specification<CustomerEntity> {
         return Specification { root, _, builder ->
-            val customerPhone = builder.lower(root.get(CustomerEntity_.PHONE))
+            val customerPhone = builder.lower(root.get(CustomerEntity_.phone))
             builder.like(customerPhone, "%${phone.lowercase()}%")
         }
     }
 
     private fun emailLike(email: String): Specification<CustomerEntity> {
         return Specification { root, _, builder ->
-            val customerEmail = builder.lower(root.get(CustomerEntity_.EMAIL))
+            val customerEmail = builder.lower(root.get(CustomerEntity_.email))
             builder.like(customerEmail, "%${email.lowercase()}%")
         }
     }

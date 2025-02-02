@@ -21,7 +21,7 @@ class SupplierService(
 
     @Transactional
     fun delete(id: Int) {
-        val supplier = supplierRepository.findById(id).orElse(null)
+        val supplier = supplierRepository.findById(id).getOrNull()
             ?: throw NotFoundException("Cannot delete, no supplier with ID $id exists.")
         supplierRepository.delete(supplier)
     }
@@ -48,12 +48,12 @@ class SupplierService(
             ingredients = ingredients
         ).let { supplierRepository.save(it) }
 
-        return supplierRepository.save(supplier)
+        return supplier
     }
 
     @Transactional
     fun updateSupplier(id: Int, request: SupplierUpdateRequest): SupplierEntity {
-        val supplier = supplierRepository.findById(id)
+        var supplier = supplierRepository.findById(id)
             .orElseThrow { NotFoundException("Cannot update, no supplier with ID $id exists.") }
 
         request.street?.let { supplier.street = it }
@@ -63,7 +63,8 @@ class SupplierService(
         request.phone?.let { supplier.phone = it }
         request.email?.let { supplier.email = it }
 
-        return supplierRepository.save(supplier)
+        supplier = supplierRepository.save(supplier)
+        return supplier
     }
 
     fun query(params: SupplierQueryParams): Page<SupplierEntity> {
@@ -111,49 +112,50 @@ class SupplierService(
 
     private fun supplierNameLike(name: String): Specification<SupplierEntity> {
         return Specification { root, _, builder ->
-            val supplierName = builder.lower(root.get<String>("supplierName"))
+            val supplierName = builder.lower(root.get(SupplierEntity_.name))
             builder.like(supplierName, "%${name.lowercase()}%")
         }
     }
 
     private fun streetLike(street: String): Specification<SupplierEntity> {
         return Specification { root, _, builder ->
-            val streetField = builder.lower(root.get<String>("street"))
-            builder.like(streetField, "%${street.lowercase()}%")
+            val supplierStreet = builder.lower(root.get(SupplierEntity_.street))
+            builder.like(supplierStreet, "%${street.lowercase()}%")
         }
     }
 
     private fun houseNumberLike(houseNumber: String): Specification<SupplierEntity> {
         return Specification { root, _, builder ->
-            val houseNumberField = builder.lower(root.get<String>("houseNumber"))
-            builder.like(houseNumberField, "%${houseNumber.lowercase()}%")
+            val supplierHouseNumber = builder.lower(root.get(SupplierEntity_.houseNumber))
+            builder.like(supplierHouseNumber, "%${houseNumber.lowercase()}%")
         }
     }
 
     private fun zipCodeEquals(zipCode: String): Specification<SupplierEntity> {
         return Specification { root, _, builder ->
-            builder.equal(builder.lower(root.get<String>("zipCode")), zipCode.lowercase())
+            val supplierZipCode = builder.lower(root.get(SupplierEntity_.zipCode))
+            builder.like(supplierZipCode, "%${zipCode.lowercase()}%")
         }
     }
 
     private fun cityLike(city: String): Specification<SupplierEntity> {
         return Specification { root, _, builder ->
-            val cityField = builder.lower(root.get<String>("city"))
-            builder.like(cityField, "%${city.lowercase()}%")
+            val supplierCity = builder.lower(root.get(SupplierEntity_.city))
+            builder.like(supplierCity, "%${city.lowercase()}%")
         }
     }
 
     private fun phoneLike(phone: String): Specification<SupplierEntity> {
         return Specification { root, _, builder ->
-            val phoneField = builder.lower(root.get<String>("phone"))
-            builder.like(phoneField, "%${phone.lowercase()}%")
+            val supplierPhone = builder.lower(root.get(SupplierEntity_.phone))
+            builder.like(supplierPhone, "%${phone.lowercase()}%")
         }
     }
 
     private fun emailLike(email: String): Specification<SupplierEntity> {
         return Specification { root, _, builder ->
-            val emailField = builder.lower(root.get<String>("email"))
-            builder.like(emailField, "%${email.lowercase()}%")
+            val supplierEmail = builder.lower(root.get(SupplierEntity_.email))
+            builder.like(supplierEmail, "%${email.lowercase()}%")
         }
     }
 }
