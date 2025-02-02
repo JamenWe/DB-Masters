@@ -13,10 +13,10 @@ class CustomerEntity (
     val id: Int = 0,
 
     @Column(name = "last_name", nullable = false, length = 50)
-    var lastName: String,
+    val lastName: String,
 
     @Column(name = "first_name", nullable = false, length = 50)
-    var firstName: String,
+    val firstName: String,
 
     @Column(name = "date_of_birth")
     var dateOfBirth: LocalDate?,

@@ -1,4 +1,4 @@
-package org.dbm.krautundrueben.system;
+package system;
 
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.Expression;

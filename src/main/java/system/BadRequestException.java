@@ -1,4 +1,4 @@
-package org.dbm.krautundrueben.system;
+package system;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.lang.Nullable;

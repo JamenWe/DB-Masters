@@ -2,11 +2,11 @@ package org.dbm.krautundrueben.domain.customer
 
 import jakarta.transaction.Transactional
 import org.dbm.krautundrueben.api.admin.dto.CustomerUpdateRequest
-import org.dbm.krautundrueben.system.CriteriaUtil
-import org.dbm.krautundrueben.system.NotFoundException
 import org.springframework.data.domain.Page
 import org.springframework.data.jpa.domain.Specification
 import org.springframework.stereotype.Service
+import system.CriteriaUtil
+import system.NotFoundException
 import java.time.LocalDate
 import kotlin.jvm.optionals.getOrNull
 
@@ -30,13 +30,13 @@ class CustomerService(
     fun createCustomer(
         lastName: String,
         firstName: String,
-        dateOfBirth: LocalDate,
-        street: String,
-        houseNumber: String,
-        zipCode: String,
-        city: String,
-        phone: String,
-        email: String,
+        dateOfBirth: LocalDate?,
+        street: String?,
+        houseNumber: String?,
+        zipCode: String?,
+        city: String?,
+        phone: String?,
+        email: String?,
     ): CustomerEntity {
         val customer = CustomerEntity(
             lastName = lastName,
@@ -58,13 +58,13 @@ class CustomerService(
         var customer = customerRepository.findById(id)
             .orElseThrow { NotFoundException("Cannot update, no customer with ID $id exists.") }
 
-        customer.dateOfBirth = request.dateOfBirth
-        customer.street = request.street
-        customer.houseNumber = request.houseNumber
-        customer.zipCode = request.zipCode
-        customer.city = request.city
-        customer.phone = request.phone
-        customer.email = request.email
+        request.dateOfBirth?.let { customer.dateOfBirth = it }
+        request.street?.let { customer.street = it }
+        request.houseNumber?.let { customer.houseNumber = it }
+        request.zipCode?.let { customer.zipCode = it }
+        request.city?.let { customer.city = it }
+        request.phone?.let { customer.phone = it }
+        request.email?.let { customer.email = it }
 
         customer = customerRepository.save(customer)
         return customer
@@ -121,42 +121,42 @@ class CustomerService(
 
     private fun lastNameLike(lastName: String): Specification<CustomerEntity> {
         return Specification { root, _, builder ->
-            val customerLastName = builder.lower(root.get(CustomerEntity_.LAST_NAME))
+            val customerLastName = builder.lower(root.get(CustomerEntity_.lastName))
             builder.like(customerLastName, "%${lastName.lowercase()}%")
         }
     }
 
     private fun firstNameLike(firstname: String): Specification<CustomerEntity> {
         return Specification { root, _, builder ->
-            val customerFirstName = builder.lower(root.get(CustomerEntity_.FIRST_NAME))
+            val customerFirstName = builder.lower(root.get(CustomerEntity_.firstName))
             builder.like(customerFirstName, "%${firstname.lowercase()}%")
         }
     }
 
     private fun dateOfBirthEquals(dateOfBirth: LocalDate): Specification<CustomerEntity> {
         return Specification { root, _, builder ->
-            val dob = root.get<LocalDate>(CustomerEntity_.DATE_OF_BIRTH)
+            val dob = root.get<LocalDate>(CustomerEntity_.dateOfBirth)
             builder.equal(dob, dateOfBirth)
         }
     }
 
     private fun streetLike(street: String): Specification<CustomerEntity> {
         return Specification { root, _, builder ->
-            val customerStreet = builder.lower(root.get(CustomerEntity_.STREET))
+            val customerStreet = builder.lower(root.get(CustomerEntity_.street))
             builder.like(customerStreet, "%${street.lowercase()}%")
         }
     }
 
     private fun houseNumberLike(houseNumber: String): Specification<CustomerEntity> {
         return Specification { root, _, builder ->
-            val customerHouseNumber = builder.lower(root.get(CustomerEntity_.HOUSE_NUMBER))
+            val customerHouseNumber = builder.lower(root.get(CustomerEntity_.houseNumber))
             builder.like(customerHouseNumber, "%${houseNumber.lowercase()}%")
         }
     }
 
     private fun zipCodeEquals(zipCode: String): Specification<CustomerEntity> {
         return Specification { root, _, builder ->
-            val customerZipCode = builder.lower(root.get(CustomerEntity_.ZIP_CODE))
+            val customerZipCode = builder.lower(root.get(CustomerEntity_.zipCode))
             builder.like(customerZipCode, zipCode)
         }
     }
