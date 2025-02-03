@@ -44,14 +44,12 @@ WHERE
     order_recipe.order_id = 41;
 
 -- Get all the ingredients that are not found in a recipe yet
-SELECT
-    ingredient.ingredient_id,
-    ingredient.ingredient_name
-FROM
-    ingredient
-    LEFT JOIN recipe_ingredient ON ingredient.ingredient_id = recipe_ingredient.ingredient_id
-WHERE
-    recipe_ingredient.recipe_id IS NULL;
+SELECT ingredient_name
+FROM ingredient
+WHERE ingredient_id NOT IN (
+    SELECT ingredient_id
+    FROM recipe_ingredient
+);
 
 
 -- Get all recipes that have over 1000 calories
