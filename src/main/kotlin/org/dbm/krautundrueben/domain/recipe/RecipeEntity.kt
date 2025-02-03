@@ -11,19 +11,19 @@ class RecipeEntity (
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "recipe_id", nullable = false, updatable = false)
-    val id: Int,
+    val id: Int = 0,
 
     @Column(name = "recipe_name", nullable = false, length = 50)
-    val name: String,
+    var name: String,
 
     @Column(name = "net_price", nullable = false, precision = 10, scale = 2)
-    val netPrice: BigDecimal,
+    var netPrice: BigDecimal,
 
     @Column(name = "preparation_time")
-    val preparationTime: Int?,
+    var preparationTime: Int?,
 
     @Column(name = "instructions", columnDefinition = "TEXT")
-    val instructions: String?,
+    var instructions: String?,
 
     @OneToMany(mappedBy = "recipe", cascade = [CascadeType.ALL], fetch = FetchType.LAZY)
     val recipeIngredients: List<RecipeIngredientEntity>,

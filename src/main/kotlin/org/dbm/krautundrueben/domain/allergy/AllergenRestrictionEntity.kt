@@ -10,10 +10,10 @@ class AllergenRestrictionEntity (
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "allergen_restriction_id", nullable = false, updatable = false)
-    val id: Int,
+    val id: Int = 0,
 
     @Column(name = "name", nullable = false, length = 50)
-    val name: String,
+    var name: String,
 
     @OneToMany(mappedBy = "allergenRestriction", cascade = [CascadeType.ALL], fetch = FetchType.LAZY)
     val recipeAllergenRestrictions: List<RecipeAllergenRestrictionEntity>

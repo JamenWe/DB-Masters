@@ -11,30 +11,30 @@ class IngredientEntity (
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "ingredient_id", nullable = false, updatable = false)
-    val id: Int,
+    val id: Int = 0,
 
     @Column(name = "ingredient_name", nullable = false, length = 50)
     val name: String,
 
     @Column(name = "unit", length = 25)
-    val unit: String?,
+    var unit: String?,
 
     @Column(name = "net_price", precision = 10, scale = 2)
-    val netPrice: BigDecimal?,
+    var netPrice: BigDecimal?,
 
     @Column(name = "stock")
-    val stock: Int?,
+    var stock: Int?,
 
     @Column(name = "calories")
-    val calories: Int?,
+    var calories: Int?,
 
     @Column(name = "carbohydrates", precision = 10, scale = 2)
-    val carbohydrates: BigDecimal?,
+    var carbohydrates: BigDecimal?,
 
     @Column(name = "protein", precision = 10, scale = 2)
-    val protein: BigDecimal?,
+    var protein: BigDecimal?,
 
     @ManyToOne
     @JoinColumn(name = "supplier_id", foreignKey = ForeignKey(name = "ingredient_supplier_id_fkey"))
-    val supplier: SupplierEntity?
+    var supplier: SupplierEntity?
 )

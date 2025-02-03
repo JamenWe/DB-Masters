@@ -10,10 +10,10 @@ class NutritionalCategoryEntity (
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "nutritional_category_id", nullable = false, updatable = false)
-    val id: Int,
+    val id: Int = 0,
 
     @Column(name = "name", nullable = false, length = 50)
-    val name: String,
+    var name: String,
 
     @OneToMany(mappedBy = "nutritionalCategory", cascade = [CascadeType.ALL], fetch = FetchType.LAZY)
     val recipeNutritionalCategories: List<RecipeNutritionalCategoryEntity>
