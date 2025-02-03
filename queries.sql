@@ -8,6 +8,7 @@ FROM
 WHERE
     recipe.recipe_name = 'Salmon Lasagna';
 
+
 -- Get recipes of a nutritional category ( parsing name of the cat )
 SELECT
     recipe.recipe_name
@@ -18,6 +19,7 @@ FROM
 WHERE
     nutritional_category.name = 'Vegetarian';
 
+
 -- Get all the recipes that include a ingredient ( parsing ingredient name )
 SELECT
     recipe.recipe_name
@@ -27,6 +29,7 @@ FROM
     JOIN recipe ON recipe_ingredient.recipe_id = recipe.recipe_id
 WHERE
     ingredient.ingredient_name = 'Potato';
+
 
 -- Get the avrage nutritional values of the recipes of a order
 SELECT
@@ -50,6 +53,7 @@ FROM
 WHERE
     recipe_ingredient.recipe_id IS NULL;
 
+
 -- Get all recipes that have over 1000 calories
 SELECT
     recipe.recipe_id,
@@ -67,6 +71,7 @@ HAVING
 ORDER BY
     recipe.recipe_id;
 
+
 -- Get all recipes with less than 5 ingredients
 SELECT
     recipe.recipe_id,
@@ -82,6 +87,7 @@ HAVING
     COUNT(recipe_ingredient.ingredient_id) < 5
 ORDER BY
     recipe.recipe_id;
+
 
 --Get all recipes with less than 10 ingredients and a certain nutritional category (we have to get it with less then 5)
 SELECT
@@ -102,3 +108,60 @@ HAVING
     COUNT(recipe_ingredient.ingredient_id) < 10
 ORDER BY
     recipe.recipe_id;
+
+
+-- 3 EXTRA QUERIES 
+
+
+-- Get all recipes fitting to a alleric restriction
+SELECT
+    recipe.recipe_id,
+    recipe.recipe_name
+FROM
+    recipe
+JOIN
+    recipe_allergen_restriction ON recipe.recipe_id = recipe_allergen_restriction.recipe_id
+JOIN
+    allergen_restriction ON recipe_allergen_restriction.allergen_restriction_id = allergen_restriction.allergen_restriction_id
+WHERE
+    allergen_restriction.name = 'Lactose';
+
+
+-- Get all orders which recipes over 500 calories 
+SELECT 
+    order.order_id,
+    order.order_date,
+    recipe.recipe_name,
+    SUM(ingredient.calories) AS total_calories
+FROM 
+    order
+JOIN 
+    order_recipe ON order.order_id = order_recipe.order_id
+JOIN 
+    recipe ON order_recipe.recipe_id = recipe.recipe_id
+JOIN 
+    recipe_ingredient ON recipe.recipe_id = recipe_ingredient.recipe_id
+JOIN 
+    ingredient ON recipe_ingredient.ingredient_id = ingredient.ingredient_id
+GROUP BY 
+    order.order_id, order.order_date, recipe.recipe_name
+HAVING 
+    SUM(ingredient.calories) > 500;
+
+
+-- Get all recipes with ingredients coming from a certain supplier
+SELECT
+    DISTINCT recipe.recipe_id,
+    recipe.recipe_name
+FROM
+    recipe
+JOIN
+    recipe_ingredient ON recipe.recipe_id = recipe_ingredient.recipe_id
+JOIN
+    ingredient ON recipe_ingredient.ingredient_id = ingredient.ingredient_id
+JOIN
+    supplier ON ingredient.supplier_id = supplier.supplier_id
+WHERE
+    supplier.supplier_name = 'Henning Dairy';
+
+
