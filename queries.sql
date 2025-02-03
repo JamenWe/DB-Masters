@@ -162,4 +162,11 @@ JOIN
 WHERE
     supplier.supplier_name = 'Henning Dairy';
 
+-- example inner join: Get all recipes with their ingredients 
+SELECT recipe.recipe_name, ingredient.ingredient_name
+FROM recipe
+INNER JOIN recipe_ingredient ON recipe.recipe_id = recipe_ingredient.recipe_id
+INNER JOIN ingredient ON recipe_ingredient.ingredient_id = ingredient.ingredient_id;
+
+-- example for right/left join: Get recipes 
 
