@@ -3,7 +3,6 @@ package org.dbm.krautundrueben.domain.nutrition
 import jakarta.persistence.criteria.JoinType
 import jakarta.transaction.Transactional
 import org.dbm.krautundrueben.api.admin.dto.NutritionalCategoryUpdateRequest
-import org.dbm.krautundrueben.domain.recipe.RecipeEntity
 import org.dbm.krautundrueben.domain.recipe.RecipeNutritionalCategoryEntity
 import org.springframework.data.domain.Page
 import org.springframework.data.jpa.domain.Specification
@@ -31,11 +30,9 @@ class NutritionalCategoryService(
     @Transactional
     fun createNutritionalCategory(
         name: String,
-        recipeNutritionalCategories: List<RecipeNutritionalCategoryEntity>
     ): NutritionalCategoryEntity {
         val nutritionalCategory = NutritionalCategoryEntity(
-            name = name,
-            recipeNutritionalCategories = recipeNutritionalCategories
+            name = name
         ).let { nutritionalCategoryRepository.save(it) }
 
         return nutritionalCategory
@@ -67,8 +64,8 @@ class NutritionalCategoryService(
         if (!params.name.isNullOrBlank()) {
             specifications.add(nameLike(params.name))
         }
-        if (params.recipeNutritionalCategories != null) {
-            specifications.add(recipeNutritionalCategoriesEquals(params.recipeNutritionalCategories))
+        if (params.recipeId != null) {
+            specifications.add(recipeIdEquals(params.recipeId))
         }
 
         return Specification.allOf(specifications).and(CriteriaUtil.distinct())
@@ -87,12 +84,10 @@ class NutritionalCategoryService(
         }
     }
 
-    private fun recipeNutritionalCategoriesEquals(recipeNutritionalCategory: RecipeNutritionalCategoryEntity): Specification<NutritionalCategoryEntity> {
-        return Specification { root, query, builder ->
+    private fun recipeIdEquals(recipeId: Int): Specification<NutritionalCategoryEntity> {
+        return Specification { root, _, builder ->
             val join = root.join<NutritionalCategoryEntity, RecipeNutritionalCategoryEntity>("recipeNutritionalCategories", JoinType.LEFT)
-            val recipePredicate = builder.equal(join.get<RecipeEntity>("recipe"), recipeNutritionalCategory.recipe)
-            val nutritionalCategoryPredicate = builder.equal(join.get<NutritionalCategoryEntity>("nutritionalCategory"), recipeNutritionalCategory.nutritionalCategory)
-            builder.and(recipePredicate, nutritionalCategoryPredicate)
+            builder.equal(join.get<Int>("recipe").get<Int>("id"), recipeId)
         }
     }
 }

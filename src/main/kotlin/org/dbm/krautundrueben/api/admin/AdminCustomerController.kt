@@ -43,7 +43,7 @@ class CustomerController(
         @RequestParam(required = false) email: String?,
         @RequestParam(defaultValue = "0") offset: Int,
         @RequestParam(defaultValue = "50") limit: Int,
-        @RequestParam(defaultValue = "desc") sortDir: Sort.Direction,
+        @RequestParam(defaultValue = "DESC") sortDir: Sort.Direction,
         @RequestParam(required = false) sortField: String?
     ): PaginatedCustomers {
         val params = CustomerQueryParams(
@@ -72,7 +72,7 @@ class CustomerController(
 
     @PostMapping
     @Transactional
-    fun createCustomer(@RequestBody createCustomerRequest: CreateCustomerRequest): ResponseEntity<CustomerDto> {
+    fun createCustomer(@RequestBody createCustomerRequest: CustomerCreateRequest): ResponseEntity<CustomerDto> {
         logger().info("Received POST create customer request: {}", createCustomerRequest)
 
         val customer = customerService.createCustomer(

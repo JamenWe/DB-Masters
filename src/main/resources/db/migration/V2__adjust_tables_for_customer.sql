@@ -16,8 +16,8 @@ CREATE TABLE IF NOT EXISTS recipe_ingredient (
 );
 
 CREATE TABLE IF NOT EXISTS order_recipe (
-    recipe_id INTEGER NOT NULL,
     order_id INTEGER NOT NULL,
+    recipe_id INTEGER NOT NULL,
     quantity INTEGER,
     PRIMARY KEY (recipe_id, order_id),
     FOREIGN KEY (order_id) REFERENCES "order" (order_id),

@@ -5,5 +5,7 @@ import java.time.LocalDate
 
 data class OrderUpdateRequest(
     val orderDate: LocalDate?,
-    val invoiceAmount: BigDecimal?
+    val invoiceAmount: BigDecimal?,
+    val orderIngredients: List<OrderIngredientRequest>?,
+    val orderRecipes: List<OrderRecipeRequest>?
 )

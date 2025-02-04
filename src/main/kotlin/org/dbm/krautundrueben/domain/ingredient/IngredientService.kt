@@ -2,11 +2,11 @@ package org.dbm.krautundrueben.domain.ingredient
 
 import jakarta.transaction.Transactional
 import org.dbm.krautundrueben.api.admin.dto.IngredientUpdateRequest
-import org.dbm.krautundrueben.domain.supplier.SupplierEntity
 import org.dbm.krautundrueben.domain.supplier.SupplierRepository
 import org.springframework.data.domain.Page
 import org.springframework.data.jpa.domain.Specification
 import org.springframework.stereotype.Service
+import system.BadRequestException
 import system.CriteriaUtil
 import system.NotFoundException
 import java.math.BigDecimal
@@ -31,22 +31,24 @@ class IngredientService(
 
     @Transactional
     fun createIngredient(
-        ingredientName: String,
+        name: String,
         unit: String?,
         netPrice: BigDecimal?,
         stock: Int?,
         calories: Int?,
         carbohydrates: BigDecimal?,
         protein: BigDecimal?,
-        supplierId: Int?
+        supplierId: Int
     ): IngredientEntity {
-        val supplier = supplierId?.let { id ->
-            supplierRepository.findById(id).getOrNull()
-                ?: throw NotFoundException("Supplier with ID $id not found.")
+        if (name.isBlank()) {
+            throw BadRequestException("Ingredient name cannot be empty")
         }
 
+        val supplier = supplierRepository.findById(supplierId).getOrNull()
+            ?: throw NotFoundException("Supplier with ID $supplierId not found.")
+
         val ingredient = IngredientEntity(
-            name = ingredientName,
+            name = name,
             unit = unit,
             netPrice = netPrice,
             stock = stock,
@@ -114,8 +116,8 @@ class IngredientService(
         if (params.protein != null) {
             specifications.add(proteinEquals(params.protein))
         }
-        if (params.supplier != null) {
-            specifications.add(supplierEquals(params.supplier))
+        if (params.supplierId != null) {
+            specifications.add(supplierIdEquals(params.supplierId))
         }
 
         return Specification.allOf(specifications).and(CriteriaUtil.distinct())
@@ -171,9 +173,10 @@ class IngredientService(
         }
     }
 
-    private fun supplierEquals(supplier: SupplierEntity): Specification<IngredientEntity> {
+    private fun supplierIdEquals(supplierId: Int): Specification<IngredientEntity> {
         return Specification { root, _, builder ->
-            builder.equal(root.get(IngredientEntity_.supplier), supplier)
+            val supplier = root.get(IngredientEntity_.supplier)
+            builder.equal(supplier.get<Int>("id"), supplierId)
         }
     }
 }

@@ -6,5 +6,6 @@ data class SupplierUpdateRequest(
     val zipCode: String?,
     val city: String?,
     val phone: String?,
-    val email: String?
+    val email: String?,
+    val ingredientIds: List<Int>?
 )

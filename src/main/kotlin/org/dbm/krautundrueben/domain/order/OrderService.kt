@@ -2,11 +2,14 @@ package org.dbm.krautundrueben.domain.order
 
 import jakarta.persistence.criteria.JoinType
 import jakarta.transaction.Transactional
+import org.dbm.krautundrueben.api.admin.dto.OrderIngredientRequest
+import org.dbm.krautundrueben.api.admin.dto.OrderRecipeRequest
 import org.dbm.krautundrueben.api.admin.dto.OrderUpdateRequest
-import org.dbm.krautundrueben.domain.customer.CustomerEntity
 import org.dbm.krautundrueben.domain.customer.CustomerRepository
 import org.dbm.krautundrueben.domain.ingredient.IngredientEntity
+import org.dbm.krautundrueben.domain.ingredient.IngredientRepository
 import org.dbm.krautundrueben.domain.recipe.RecipeEntity
+import org.dbm.krautundrueben.domain.recipe.RecipeRepository
 import org.springframework.data.domain.Page
 import org.springframework.data.jpa.domain.Specification
 import org.springframework.stereotype.Service
@@ -19,7 +22,11 @@ import kotlin.jvm.optionals.getOrNull
 @Service
 class OrderService(
     private val orderRepository: OrderRepository,
-    private val customerRepository: CustomerRepository
+    private val customerRepository: CustomerRepository,
+    private val ingredientRepository: IngredientRepository,
+    private val recipeRepository: RecipeRepository,
+    private val orderIngredientRepository: OrderIngredientRepository,
+    private val orderRecipeRepository: OrderRecipeRepository
 ) {
 
     fun findById(id: Int): OrderEntity? {
@@ -37,12 +44,16 @@ class OrderService(
     fun createOrder(
         customerId: Int,
         orderDate: LocalDate,
-        invoiceAmount: BigDecimal?
+        invoiceAmount: BigDecimal?,
+        orderIngredients: List<OrderIngredientRequest>,
+        orderRecipes: List<OrderRecipeRequest>
     ): OrderEntity {
+        // Find customer
         val customer = customerRepository.findById(customerId).getOrNull()
             ?: throw NotFoundException("Customer with ID $customerId not found.")
 
-        val order = OrderEntity(
+        // Create the base order
+        var order = OrderEntity(
             customer = customer,
             orderDate = orderDate,
             invoiceAmount = invoiceAmount,
@@ -50,6 +61,38 @@ class OrderService(
             orderRecipes = emptyList()
         ).let { orderRepository.save(it) }
 
+        // Handle ingredients if any
+        if (orderIngredients.isNotEmpty()) {
+            val newOrderIngredients = orderIngredients.map { ingredientRequest ->
+                val ingredient = ingredientRepository.findById(ingredientRequest.ingredientId).getOrNull()
+                    ?: throw NotFoundException("Ingredient with ID ${ingredientRequest.ingredientId} not found.")
+
+                OrderIngredientEntity(
+                    order = order,
+                    ingredient = ingredient,
+                    quantity = ingredientRequest.quantity
+                )
+            }
+            orderIngredientRepository.saveAll(newOrderIngredients)
+        }
+
+        // Handle recipes if any
+        if (orderRecipes.isNotEmpty()) {
+            val newOrderRecipes = orderRecipes.map { recipeRequest ->
+                val recipe = recipeRepository.findById(recipeRequest.recipeId).getOrNull()
+                    ?: throw NotFoundException("Recipe with ID ${recipeRequest.recipeId} not found.")
+
+                OrderRecipeEntity(
+                    order = order,
+                    recipe = recipe,
+                    quantity = recipeRequest.quantity
+                )
+            }
+            orderRecipeRepository.saveAll(newOrderRecipes)
+        }
+
+        // Refresh the order to include all associations
+        order = orderRepository.findById(order.id).get()
         return order
     }
 
@@ -58,11 +101,57 @@ class OrderService(
         var order = orderRepository.findById(id)
             .orElseThrow { NotFoundException("Cannot update, no order with ID $id exists.") }
 
+        // Update basic fields if provided
         request.orderDate?.let { order.orderDate = it }
         request.invoiceAmount?.let { order.invoiceAmount = it }
 
+        // Update ingredients if provided
+        if (request.orderIngredients != null) {
+            // Remove existing ingredients
+            val existingIngredients = orderIngredientRepository.findByOrderId(order.id)
+            orderIngredientRepository.deleteAll(existingIngredients)
+
+            // Add new ingredients if any
+            if (request.orderIngredients.isNotEmpty()) {
+                val newOrderIngredients = request.orderIngredients.map { ingredientRequest ->
+                    val ingredient = ingredientRepository.findById(ingredientRequest.ingredientId).getOrNull()
+                        ?: throw NotFoundException("Ingredient with ID ${ingredientRequest.ingredientId} not found.")
+
+                    OrderIngredientEntity(
+                        order = order,
+                        ingredient = ingredient,
+                        quantity = ingredientRequest.quantity
+                    )
+                }
+                orderIngredientRepository.saveAll(newOrderIngredients)
+            }
+        }
+
+        // Update recipes if provided
+        if (request.orderRecipes != null) {
+            // Remove existing recipes
+            val existingRecipes = orderRecipeRepository.findByOrderId(order.id)
+            orderRecipeRepository.deleteAll(existingRecipes)
+
+            // Add new recipes if any
+            if (request.orderRecipes.isNotEmpty()) {
+                val newOrderRecipes = request.orderRecipes.map { recipeRequest ->
+                    val recipe = recipeRepository.findById(recipeRequest.recipeId).getOrNull()
+                        ?: throw NotFoundException("Recipe with ID ${recipeRequest.recipeId} not found.")
+
+                    OrderRecipeEntity(
+                        order = order,
+                        recipe = recipe,
+                        quantity = recipeRequest.quantity
+                    )
+                }
+                orderRecipeRepository.saveAll(newOrderRecipes)
+            }
+        }
+
+        // Save and refresh the order
         order = orderRepository.save(order)
-        return order
+        return orderRepository.findById(order.id).get()
     }
 
     fun query(params: OrderQueryParams): Page<OrderEntity> {
@@ -77,8 +166,8 @@ class OrderService(
         if (params.id != null) {
             specifications.add(idEquals(params.id))
         }
-        if (params.customer != null) {
-            specifications.add(customerEquals(params.customer))
+        if (params.customerId != null) {
+            specifications.add(customerIdEquals(params.customerId))
         }
         if (params.orderDate != null) {
             specifications.add(orderDateEquals(params.orderDate))
@@ -86,11 +175,11 @@ class OrderService(
         if (params.invoiceAmount != null) {
             specifications.add(invoiceAmountEquals(params.invoiceAmount))
         }
-        if (params.orderIngredients != null) {
-            specifications.add(orderIngredientsEquals(params.orderIngredients))
+        if (params.ingredientId != null) {
+            specifications.add(hasIngredient(params.ingredientId))
         }
-        if (params.orderRecipes != null) {
-            specifications.add(orderRecipesEquals(params.orderRecipes))
+        if (params.recipeId != null) {
+            specifications.add(hasRecipe(params.recipeId))
         }
 
         return Specification.allOf(specifications).and(CriteriaUtil.distinct())
@@ -102,9 +191,9 @@ class OrderService(
         }
     }
 
-    private fun customerEquals(customer: CustomerEntity): Specification<OrderEntity> {
+    private fun customerIdEquals(customerId: Int): Specification<OrderEntity> {
         return Specification { root, _, builder ->
-            builder.equal(root.get(OrderEntity_.customer), customer)
+            builder.equal(root.get(OrderEntity_.customer).get<Int>("id"), customerId)
         }
     }
 
@@ -120,21 +209,17 @@ class OrderService(
         }
     }
 
-    private fun orderIngredientsEquals(orderIngredient: OrderIngredientEntity): Specification<OrderEntity> {
+    private fun hasIngredient(ingredientId: Int): Specification<OrderEntity> {
         return Specification { root, _, builder ->
             val join = root.join<OrderEntity, OrderIngredientEntity>("orderIngredients", JoinType.LEFT)
-            val orderPredicate = builder.equal(join.get<OrderEntity>("order"), orderIngredient.order)
-            val ingredientPredicate = builder.equal(join.get<IngredientEntity>("ingredient"), orderIngredient.ingredient)
-            builder.and(orderPredicate, ingredientPredicate)
+            builder.equal(join.get<IngredientEntity>("ingredient").get<Int>("id"), ingredientId)
         }
     }
 
-    private fun orderRecipesEquals(orderRecipe: OrderRecipeEntity): Specification<OrderEntity> {
+    private fun hasRecipe(recipeId: Int): Specification<OrderEntity> {
         return Specification { root, _, builder ->
             val join = root.join<OrderEntity, OrderRecipeEntity>("orderRecipes", JoinType.LEFT)
-            val recipePredicate = builder.equal(join.get<RecipeEntity>("recipe"), orderRecipe.recipe)
-            val orderPredicate = builder.equal(join.get<OrderEntity>("order"), orderRecipe.order)
-            builder.and(recipePredicate, orderPredicate)
+            builder.equal(join.get<RecipeEntity>("recipe").get<Int>("id"), recipeId)
         }
     }
 }

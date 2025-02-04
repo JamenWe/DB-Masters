@@ -2,10 +2,10 @@ package org.dbm.krautundrueben.domain.supplier
 
 import jakarta.transaction.Transactional
 import org.dbm.krautundrueben.api.admin.dto.SupplierUpdateRequest
-import org.dbm.krautundrueben.domain.ingredient.IngredientEntity
 import org.springframework.data.domain.Page
 import org.springframework.data.jpa.domain.Specification
 import org.springframework.stereotype.Service
+import system.BadRequestException
 import system.CriteriaUtil
 import system.NotFoundException
 import kotlin.jvm.optionals.getOrNull
@@ -23,6 +23,11 @@ class SupplierService(
     fun delete(id: Int) {
         val supplier = supplierRepository.findById(id).getOrNull()
             ?: throw NotFoundException("Cannot delete, no supplier with ID $id exists.")
+
+        if (supplier.ingredients.isNotEmpty()) {
+            throw BadRequestException("Cannot delete supplier with ID $id as it has associated ingredients.")
+        }
+
         supplierRepository.delete(supplier)
     }
 
@@ -34,9 +39,12 @@ class SupplierService(
         zipCode: String?,
         city: String?,
         phone: String?,
-        email: String?,
-        ingredients: List<IngredientEntity>,
+        email: String?
     ): SupplierEntity {
+        if (name.isBlank()) {
+            throw BadRequestException("Supplier name cannot be empty")
+        }
+
         val supplier = SupplierEntity(
             name = name,
             street = street,
@@ -44,12 +52,12 @@ class SupplierService(
             zipCode = zipCode,
             city = city,
             phone = phone,
-            email = email,
-            ingredients = ingredients
+            email = email
         ).let { supplierRepository.save(it) }
 
         return supplier
     }
+
 
     @Transactional
     fun updateSupplier(id: Int, request: SupplierUpdateRequest): SupplierEntity {

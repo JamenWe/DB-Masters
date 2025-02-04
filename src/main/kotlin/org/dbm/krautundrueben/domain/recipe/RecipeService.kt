@@ -4,11 +4,16 @@ import jakarta.persistence.criteria.JoinType
 import jakarta.transaction.Transactional
 import org.dbm.krautundrueben.api.admin.dto.RecipeUpdateRequest
 import org.dbm.krautundrueben.domain.allergy.AllergenRestrictionEntity
+import org.dbm.krautundrueben.domain.allergy.AllergenRestrictionRepository
 import org.dbm.krautundrueben.domain.ingredient.IngredientEntity
+import org.dbm.krautundrueben.domain.ingredient.IngredientQuantity
+import org.dbm.krautundrueben.domain.ingredient.IngredientRepository
 import org.dbm.krautundrueben.domain.nutrition.NutritionalCategoryEntity
+import org.dbm.krautundrueben.domain.nutrition.NutritionalCategoryRepository
 import org.springframework.data.domain.Page
 import org.springframework.data.jpa.domain.Specification
 import org.springframework.stereotype.Service
+import system.BadRequestException
 import system.CriteriaUtil
 import system.NotFoundException
 import java.math.BigDecimal
@@ -17,6 +22,9 @@ import kotlin.jvm.optionals.getOrNull
 @Service
 class RecipeService(
     private val recipeRepository: RecipeRepository,
+    private val ingredientRepository: IngredientRepository,
+    private val nutritionalCategoryRepository: NutritionalCategoryRepository,
+    private val allergenRestrictionRepository: AllergenRestrictionRepository,
     private val recipeIngredientRepository: RecipeIngredientRepository,
     private val recipeNutritionalCategoryRepository: RecipeNutritionalCategoryRepository,
     private val recipeAllergenRestrictionRepository: RecipeAllergenRestrictionRepository
@@ -35,59 +43,68 @@ class RecipeService(
 
     @Transactional
     fun createRecipe(
-        recipeName: String,
+        name: String,
         netPrice: BigDecimal,
         preparationTime: Int?,
         instructions: String?,
-        ingredients: List<IngredientEntity>?,
-        nutritionalCategories: List<NutritionalCategoryEntity>?,
-        allergenRestrictions: List<AllergenRestrictionEntity>?
+        ingredientQuantities: List<IngredientQuantity>,
+        nutritionalCategoryIds: List<Int>,
+        allergenRestrictionIds: List<Int>
     ): RecipeEntity {
-        val recipe = RecipeEntity(
-            name = recipeName,
+        if (name.isBlank()) {
+            throw BadRequestException("Recipe name cannot be empty")
+        }
+
+        // Create the base recipe
+        var recipe = RecipeEntity(
+            name = name,
             netPrice = netPrice,
             preparationTime = preparationTime,
             instructions = instructions,
-            recipeIngredients = emptyList(),
-            recipeNutritionalCategories = emptyList(),
-            recipeAllergenRestrictions = emptyList(),
-            orderRecipes = emptyList()
+            recipeIngredients = mutableListOf(),
+            recipeNutritionalCategories = mutableListOf(),
+            recipeAllergenRestrictions = mutableListOf(),
         ).let { recipeRepository.save(it) }
 
-        // Handle Ingredients
-        if (!ingredients.isNullOrEmpty()) {
-            val recipeIngredients = ingredients.map { ingredient ->
-                RecipeIngredientEntity(
-                    recipe = recipe,
-                    ingredient = ingredient,
-                    quantity = 1
-                )
-            }
-            recipeIngredientRepository.saveAll(recipeIngredients)
-        }
+        // Handle ingredients and quantities
+        val recipeIngredients = ingredientQuantities.map { ingredientQuantity ->
+            val ingredient = ingredientRepository.findById(ingredientQuantity.ingredientId).getOrNull()
+                ?: throw NotFoundException("Ingredient with ID ${ingredientQuantity.ingredientId} not found.")
 
-        // Handle Nutritional Categories
-        if (!nutritionalCategories.isNullOrEmpty()) {
-            val recipeNutritionalCategories = nutritionalCategories.map { category ->
-                RecipeNutritionalCategoryEntity(
-                    recipe = recipe,
-                    nutritionalCategory = category
-                )
-            }
-            recipeNutritionalCategoryRepository.saveAll(recipeNutritionalCategories)
+            RecipeIngredientEntity(
+                recipe = recipe,
+                ingredient = ingredient,
+                quantity = ingredientQuantity.quantity
+            )
         }
+        recipeIngredientRepository.saveAll(recipeIngredients)
 
-        // Handle Allergen Restrictions
-        if (!allergenRestrictions.isNullOrEmpty()) {
-            val recipeAllergenRestrictions = allergenRestrictions.map { restriction ->
-                RecipeAllergenRestrictionEntity(
-                    recipe = recipe,
-                    allergenRestriction = restriction
-                )
-            }
-            recipeAllergenRestrictionRepository.saveAll(recipeAllergenRestrictions)
+        // Handle nutritional categories
+        val recipeNutritionalCategories = nutritionalCategoryIds.map { categoryId ->
+            val category = nutritionalCategoryRepository.findById(categoryId).getOrNull()
+                ?: throw NotFoundException("Nutritional category with ID $categoryId not found.")
+
+            RecipeNutritionalCategoryEntity(
+                recipe = recipe,
+                nutritionalCategory = category
+            )
         }
+        recipeNutritionalCategoryRepository.saveAll(recipeNutritionalCategories)
 
+        // Handle allergen restrictions
+        val recipeAllergenRestrictions = allergenRestrictionIds.map { restrictionId ->
+            val restriction = allergenRestrictionRepository.findById(restrictionId).getOrNull()
+                ?: throw NotFoundException("Allergen restriction with ID $restrictionId not found.")
+
+            RecipeAllergenRestrictionEntity(
+                recipe = recipe,
+                allergenRestriction = restriction
+            )
+        }
+        recipeAllergenRestrictionRepository.saveAll(recipeAllergenRestrictions)
+
+        // Refresh the recipe to include all associations
+        recipe = recipeRepository.findById(recipe.id).get()
         return recipe
     }
 
@@ -96,7 +113,7 @@ class RecipeService(
         var recipe = recipeRepository.findById(id)
             .orElseThrow { NotFoundException("Cannot update, no recipe with ID $id exists.") }
 
-        request.recipeName?.let { recipe.name = it }
+        request.name?.let { recipe.name = it }
         request.netPrice?.let { recipe.netPrice = it }
         request.preparationTime?.let { recipe.preparationTime = it }
         request.instructions?.let { recipe.instructions = it }
@@ -108,24 +125,30 @@ class RecipeService(
             recipeIngredientRepository.deleteAll(existingIngredients)
 
             // Add new RecipeIngredientEntities
-            val newRecipeIngredients = request.ingredients.map { ingredient ->
+            val newRecipeIngredients = request.ingredients.map { ingredientQuantity ->
+                val ingredient = ingredientRepository.findById(ingredientQuantity.ingredientId).getOrNull()
+                    ?: throw NotFoundException("Ingredient with ID ${ingredientQuantity.ingredientId} not found.")
+
                 RecipeIngredientEntity(
                     recipe = recipe,
                     ingredient = ingredient,
-                    quantity = 1
+                    quantity = ingredientQuantity.quantity
                 )
             }
             recipeIngredientRepository.saveAll(newRecipeIngredients)
         }
 
         // Handle Nutritional Categories
-        if (request.nutritionalCategories != null) {
+        if (request.nutritionalCategoryIds != null) {
             // Remove existing RecipeNutritionalCategoryEntities
             val existingNutritionalCategories = recipeNutritionalCategoryRepository.findByRecipeId(id)
             recipeNutritionalCategoryRepository.deleteAll(existingNutritionalCategories)
 
             // Add new RecipeNutritionalCategoryEntities
-            val newRecipeNutritionalCategories = request.nutritionalCategories.map { category ->
+            val newRecipeNutritionalCategories = request.nutritionalCategoryIds.map { categoryId ->
+                val category = nutritionalCategoryRepository.findById(categoryId).getOrNull()
+                    ?: throw NotFoundException("Nutritional category with ID $categoryId not found.")
+
                 RecipeNutritionalCategoryEntity(
                     recipe = recipe,
                     nutritionalCategory = category
@@ -135,13 +158,16 @@ class RecipeService(
         }
 
         // Handle Allergen Restrictions
-        if (request.allergenRestrictions != null) {
+        if (request.allergenRestrictionIds != null) {
             // Remove existing RecipeAllergenRestrictionEntities
             val existingAllergenRestrictions = recipeAllergenRestrictionRepository.findByRecipeId(id)
             recipeAllergenRestrictionRepository.deleteAll(existingAllergenRestrictions)
 
             // Add new RecipeAllergenRestrictionEntities
-            val newRecipeAllergenRestrictions = request.allergenRestrictions.map { restriction ->
+            val newRecipeAllergenRestrictions = request.allergenRestrictionIds.map { restrictionId ->
+                val restriction = allergenRestrictionRepository.findById(restrictionId).getOrNull()
+                    ?: throw NotFoundException("Allergen restriction with ID $restrictionId not found.")
+
                 RecipeAllergenRestrictionEntity(
                     recipe = recipe,
                     allergenRestriction = restriction
@@ -178,14 +204,14 @@ class RecipeService(
         if (!params.instructions.isNullOrBlank()) {
             specifications.add(instructionsLike(params.instructions))
         }
-        if (params.ingredients != null) {
-            specifications.add(ingredientsEquals(params.ingredients))
+        if (params.ingredientId != null) {
+            specifications.add(hasIngredient(params.ingredientId))
         }
-        if (params.nutritionalCategories != null) {
-            specifications.add(nutritionalCategoriesEquals(params.nutritionalCategories))
+        if (params.nutritionalCategoryId != null) {
+            specifications.add(hasNutritionalCategory(params.nutritionalCategoryId))
         }
-        if (params.allergenRestrictions != null) {
-            specifications.add(allergenRestrictionsEquals(params.allergenRestrictions))
+        if (params.allergenRestrictionId != null) {
+            specifications.add(hasAllergenRestriction(params.allergenRestrictionId))
         }
 
         return Specification.allOf(specifications).and(CriteriaUtil.distinct())
@@ -223,30 +249,24 @@ class RecipeService(
         }
     }
 
-    private fun ingredientsEquals(orderIngredient: RecipeIngredientEntity): Specification<RecipeEntity> {
+    private fun hasIngredient(ingredientId: Int): Specification<RecipeEntity> {
         return Specification { root, query, builder ->
             val join = root.join<RecipeEntity, RecipeIngredientEntity>("recipeIngredients", JoinType.LEFT)
-            val ingredientPredicate = builder.equal(join.get<IngredientEntity>("ingredient"), orderIngredient.ingredient)
-            builder.equal(join.get<RecipeEntity>("recipe"), orderIngredient.recipe)
-            builder.and(ingredientPredicate, builder.equal(join.get<RecipeEntity>("recipe"), orderIngredient.recipe))
+            builder.equal(join.get<IngredientEntity>("ingredient").get<Int>("id"), ingredientId)
         }
     }
 
-    private fun nutritionalCategoriesEquals(recipeNutritionalCategory: RecipeNutritionalCategoryEntity): Specification<RecipeEntity> {
+    private fun hasNutritionalCategory(categoryId: Int): Specification<RecipeEntity> {
         return Specification { root, query, builder ->
             val join = root.join<RecipeEntity, RecipeNutritionalCategoryEntity>("recipeNutritionalCategories", JoinType.LEFT)
-            val categoryPredicate = builder.equal(join.get<NutritionalCategoryEntity>("nutritionalCategory"), recipeNutritionalCategory.nutritionalCategory)
-            builder.equal(join.get<RecipeEntity>("recipe"), recipeNutritionalCategory.recipe)
-            builder.and(categoryPredicate, builder.equal(join.get<RecipeEntity>("recipe"), recipeNutritionalCategory.recipe))
+            builder.equal(join.get<NutritionalCategoryEntity>("nutritionalCategory").get<Int>("id"), categoryId)
         }
     }
 
-    private fun allergenRestrictionsEquals(recipeAllergenRestriction: RecipeAllergenRestrictionEntity): Specification<RecipeEntity> {
+    private fun hasAllergenRestriction(restrictionId: Int): Specification<RecipeEntity> {
         return Specification { root, query, builder ->
             val join = root.join<RecipeEntity, RecipeAllergenRestrictionEntity>("recipeAllergenRestrictions", JoinType.LEFT)
-            val restrictionPredicate = builder.equal(join.get<AllergenRestrictionEntity>("allergenRestriction"), recipeAllergenRestriction.allergenRestriction)
-            builder.equal(join.get<RecipeEntity>("recipe"), recipeAllergenRestriction.recipe)
-            builder.and(restrictionPredicate, builder.equal(join.get<RecipeEntity>("recipe"), recipeAllergenRestriction.recipe))
+            builder.equal(join.get<AllergenRestrictionEntity>("allergenRestriction").get<Int>("id"), restrictionId)
         }
     }
 }

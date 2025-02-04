@@ -1,29 +1,26 @@
 package org.dbm.krautundrueben.api.admin.dto
 
-import org.dbm.krautundrueben.domain.customer.CustomerEntity
 import org.dbm.krautundrueben.domain.order.OrderEntity
-import org.dbm.krautundrueben.domain.order.OrderIngredientEntity
-import org.dbm.krautundrueben.domain.order.OrderRecipeEntity
 import java.math.BigDecimal
 import java.time.LocalDate
 
 data class OrderDto(
     val id: Int,
-    val customer: CustomerEntity,
+    val customerId: Int,
     val orderDate: LocalDate,
     val invoiceAmount: BigDecimal?,
-    val orderIngredients: List<OrderIngredientEntity>,
-    val orderRecipes: List<OrderRecipeEntity>,
+    val orderIngredients: List<OrderIngredientDto>,
+    val orderRecipes: List<OrderRecipeDto>
 ) {
     companion object {
         fun from(order: OrderEntity): OrderDto {
             return OrderDto(
-                order.id,
-                order.customer,
-                order.orderDate,
-                order.invoiceAmount,
-                order.orderIngredients,
-                order.orderRecipes,
+                id = order.id,
+                customerId = order.customer.id,
+                orderDate = order.orderDate,
+                invoiceAmount = order.invoiceAmount,
+                orderIngredients = order.orderIngredients.map { OrderIngredientDto.from(it) },
+                orderRecipes = order.orderRecipes.map { OrderRecipeDto.from(it) }
             )
         }
     }

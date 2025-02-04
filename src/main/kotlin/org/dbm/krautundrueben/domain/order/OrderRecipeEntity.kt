@@ -5,6 +5,7 @@ import org.dbm.krautundrueben.domain.recipe.RecipeEntity
 
 @Entity
 @Table(name = "order_recipe")
+@IdClass(OrderRecipeId::class)
 class OrderRecipeEntity (
 
     @Id

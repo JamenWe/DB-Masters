@@ -16,6 +16,6 @@ class NutritionalCategoryEntity (
     var name: String,
 
     @OneToMany(mappedBy = "nutritionalCategory", cascade = [CascadeType.ALL], fetch = FetchType.LAZY)
-    val recipeNutritionalCategories: List<RecipeNutritionalCategoryEntity>
+    val recipeNutritionalCategories: List<RecipeNutritionalCategoryEntity> = emptyList()
 
 )

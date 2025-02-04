@@ -33,7 +33,7 @@ class SupplierEntity (
     @Column(name = "email", length = 50)
     var email: String?,
 
-    @OneToMany(mappedBy = "supplier", cascade = [CascadeType.ALL], fetch = FetchType.LAZY)
-    val ingredients: List<IngredientEntity>
+    @OneToMany(mappedBy = "supplier", fetch = FetchType.LAZY)
+    val ingredients: List<IngredientEntity> = emptyList()
 
 )

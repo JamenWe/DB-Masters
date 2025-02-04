@@ -5,6 +5,7 @@ import org.dbm.krautundrueben.domain.allergy.AllergenRestrictionEntity
 
 @Entity
 @Table(name = "recipe_allergen_restriction")
+@IdClass(RecipeAllergenRestrictionId::class)
 class RecipeAllergenRestrictionEntity (
 
     @Id

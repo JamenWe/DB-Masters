@@ -1,10 +1,7 @@
 package org.dbm.krautundrueben.api.admin.dto
 
-import org.dbm.krautundrueben.domain.order.OrderRecipeEntity
-import org.dbm.krautundrueben.domain.recipe.RecipeAllergenRestrictionEntity
 import org.dbm.krautundrueben.domain.recipe.RecipeEntity
-import org.dbm.krautundrueben.domain.recipe.RecipeIngredientEntity
-import org.dbm.krautundrueben.domain.recipe.RecipeNutritionalCategoryEntity
+import org.dbm.krautundrueben.domain.recipe.RecipeIngredientDto
 import java.math.BigDecimal
 
 data class RecipeDto(
@@ -13,10 +10,9 @@ data class RecipeDto(
     val netPrice: BigDecimal,
     val preparationTime: Int?,
     val instructions: String?,
-    val recipeIngredients: List<RecipeIngredientEntity>,
-    val recipeNutritionalCategories: List<RecipeNutritionalCategoryEntity>,
-    val recipeAllergenRestrictions: List<RecipeAllergenRestrictionEntity>,
-    val orderRecipes: List<OrderRecipeEntity>,
+    val ingredients: List<RecipeIngredientDto>,
+    val nutritionalCategoryIds: List<Int>,
+    val allergenRestrictionIds: List<Int>
 ) {
     companion object {
         fun from(recipe: RecipeEntity): RecipeDto {
@@ -26,10 +22,9 @@ data class RecipeDto(
                 recipe.netPrice,
                 recipe.preparationTime,
                 recipe.instructions,
-                recipe.recipeIngredients,
-                recipe.recipeNutritionalCategories,
-                recipe.recipeAllergenRestrictions,
-                recipe.orderRecipes,
+                recipe.recipeIngredients.map { RecipeIngredientDto.from(it) },
+                recipe.recipeNutritionalCategories.map { it.nutritionalCategory.id },
+                recipe.recipeAllergenRestrictions.map { it.allergenRestriction.id },
             )
         }
     }

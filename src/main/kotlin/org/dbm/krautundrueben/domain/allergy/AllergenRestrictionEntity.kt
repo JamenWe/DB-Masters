@@ -16,6 +16,6 @@ class AllergenRestrictionEntity (
     var name: String,
 
     @OneToMany(mappedBy = "allergenRestriction", cascade = [CascadeType.ALL], fetch = FetchType.LAZY)
-    val recipeAllergenRestrictions: List<RecipeAllergenRestrictionEntity>
+    val recipeAllergenRestrictions: List<RecipeAllergenRestrictionEntity> = emptyList()
 
 )

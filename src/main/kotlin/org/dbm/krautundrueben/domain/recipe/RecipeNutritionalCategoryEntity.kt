@@ -5,7 +5,9 @@ import org.dbm.krautundrueben.domain.nutrition.NutritionalCategoryEntity
 
 @Entity
 @Table(name = "recipe_nutritional_category")
+@IdClass(RecipeNutritionalCategoryId::class)
 class RecipeNutritionalCategoryEntity (
+
     @Id
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(

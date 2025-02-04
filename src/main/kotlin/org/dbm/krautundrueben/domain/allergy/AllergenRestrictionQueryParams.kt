@@ -1,13 +1,12 @@
 package org.dbm.krautundrueben.domain.allergy
 
-import org.dbm.krautundrueben.domain.recipe.RecipeAllergenRestrictionEntity
 import org.dbm.krautundrueben.system.PaginationParams
 import org.springframework.data.domain.Sort
 
 data class AllergenRestrictionQueryParams(
     val id: Int?,
     val name: String?,
-    val recipeAllergenRestrictions: RecipeAllergenRestrictionEntity?,
+    val recipeId: Int?,
 
     override val offset: Int,
     override val limit: Int,

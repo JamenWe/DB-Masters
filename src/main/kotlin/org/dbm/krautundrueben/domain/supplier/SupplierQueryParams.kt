@@ -1,6 +1,5 @@
 package org.dbm.krautundrueben.domain.supplier
 
-import org.dbm.krautundrueben.domain.ingredient.IngredientEntity
 import org.dbm.krautundrueben.system.PaginationParams
 import org.springframework.data.domain.Sort
 
@@ -13,7 +12,6 @@ data class SupplierQueryParams(
     val city: String?,
     val phone: String?,
     val email: String?,
-    val ingredients: IngredientEntity?,
 
     override val offset: Int,
     override val limit: Int,

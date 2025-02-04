@@ -1,7 +1,6 @@
 package org.dbm.krautundrueben.domain.recipe
 
 import jakarta.persistence.*
-import org.dbm.krautundrueben.domain.order.OrderRecipeEntity
 import java.math.BigDecimal
 
 @Entity
@@ -26,15 +25,12 @@ class RecipeEntity (
     var instructions: String?,
 
     @OneToMany(mappedBy = "recipe", cascade = [CascadeType.ALL], fetch = FetchType.LAZY)
-    val recipeIngredients: List<RecipeIngredientEntity>,
+    var recipeIngredients: MutableList<RecipeIngredientEntity> = mutableListOf(),
 
     @OneToMany(mappedBy = "recipe", cascade = [CascadeType.ALL], fetch = FetchType.LAZY)
-    val recipeNutritionalCategories: List<RecipeNutritionalCategoryEntity>,
+    var recipeNutritionalCategories: MutableList<RecipeNutritionalCategoryEntity> = mutableListOf(),
 
     @OneToMany(mappedBy = "recipe", cascade = [CascadeType.ALL], fetch = FetchType.LAZY)
-    val recipeAllergenRestrictions: List<RecipeAllergenRestrictionEntity>,
-
-    @OneToMany(mappedBy = "recipe", cascade = [CascadeType.ALL], fetch = FetchType.LAZY)
-    val orderRecipes: List<OrderRecipeEntity>
+    var recipeAllergenRestrictions: MutableList<RecipeAllergenRestrictionEntity> = mutableListOf(),
 
 )

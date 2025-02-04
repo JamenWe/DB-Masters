@@ -4,7 +4,6 @@ import jakarta.persistence.criteria.JoinType
 import jakarta.transaction.Transactional
 import org.dbm.krautundrueben.api.admin.dto.AllergenRestrictionUpdateRequest
 import org.dbm.krautundrueben.domain.recipe.RecipeAllergenRestrictionEntity
-import org.dbm.krautundrueben.domain.recipe.RecipeEntity
 import org.springframework.data.domain.Page
 import org.springframework.data.jpa.domain.Specification
 import org.springframework.stereotype.Service
@@ -31,11 +30,9 @@ class AllergenRestrictionService(
     @Transactional
     fun createAllergenRestriction(
         name: String,
-        recipeAllergenRestrictions: List<RecipeAllergenRestrictionEntity>
     ): AllergenRestrictionEntity {
         val allergenRestriction = AllergenRestrictionEntity(
-            name = name,
-            recipeAllergenRestrictions = recipeAllergenRestrictions
+            name = name
         ).let { allergenRestrictionRepository.save(it) }
 
         return allergenRestriction
@@ -67,8 +64,8 @@ class AllergenRestrictionService(
         if (!params.name.isNullOrBlank()) {
             specifications.add(nameLike(params.name))
         }
-        if (params.recipeAllergenRestrictions != null) {
-            specifications.add(recipeAllergenRestrictionsEquals(params.recipeAllergenRestrictions))
+        if (params.recipeId != null) {
+            specifications.add(recipeIdEquals(params.recipeId))
         }
 
         return Specification.allOf(specifications).and(CriteriaUtil.distinct())
@@ -87,12 +84,13 @@ class AllergenRestrictionService(
         }
     }
 
-    private fun recipeAllergenRestrictionsEquals(recipeAllergenRestriction: RecipeAllergenRestrictionEntity): Specification<AllergenRestrictionEntity> {
-        return Specification { root, query, builder ->
-            val join = root.join<AllergenRestrictionEntity, RecipeAllergenRestrictionEntity>("recipeAllergenRestrictions", JoinType.LEFT)
-            val recipePredicate = builder.equal(join.get<RecipeEntity>("recipe"), recipeAllergenRestriction.recipe)
-            val allergenRestrictionPredicate = builder.equal(join.get<AllergenRestrictionEntity>("allergenRestriction"), recipeAllergenRestriction.allergenRestriction)
-            builder.and(recipePredicate, allergenRestrictionPredicate)
+    private fun recipeIdEquals(recipeId: Int): Specification<AllergenRestrictionEntity> {
+        return Specification { root, _, builder ->
+            val join = root.join<AllergenRestrictionEntity, RecipeAllergenRestrictionEntity>(
+                "recipeAllergenRestrictions",
+                JoinType.LEFT
+            )
+            builder.equal(join.get<Int>("recipe").get<Int>("id"), recipeId)
         }
     }
 }

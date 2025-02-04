@@ -6,7 +6,7 @@ import java.math.BigDecimal
 import java.time.LocalDate
 
 @Entity
-@Table(name = "order")
+@Table(name = "\"order\"")
 class OrderEntity (
 
     @Id

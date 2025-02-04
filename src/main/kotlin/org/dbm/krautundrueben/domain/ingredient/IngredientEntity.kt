@@ -36,5 +36,5 @@ class IngredientEntity (
 
     @ManyToOne
     @JoinColumn(name = "supplier_id", foreignKey = ForeignKey(name = "ingredient_supplier_id_fkey"))
-    var supplier: SupplierEntity?
+    var supplier: SupplierEntity
 )

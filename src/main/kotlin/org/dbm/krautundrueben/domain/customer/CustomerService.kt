@@ -135,7 +135,7 @@ class CustomerService(
 
     private fun dateOfBirthEquals(dateOfBirth: LocalDate): Specification<CustomerEntity> {
         return Specification { root, _, builder ->
-            val dob = root.get<LocalDate>(CustomerEntity_.dateOfBirth)
+            val dob = root.get(CustomerEntity_.dateOfBirth)
             builder.equal(dob, dateOfBirth)
         }
     }

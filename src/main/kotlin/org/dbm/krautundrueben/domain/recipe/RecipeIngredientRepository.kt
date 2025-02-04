@@ -5,7 +5,7 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor
 import org.springframework.stereotype.Repository
 
 @Repository
-interface RecipeIngredientRepository : JpaRepository<RecipeIngredientEntity, Int>,
+interface RecipeIngredientRepository : JpaRepository<RecipeIngredientEntity, RecipeIngredientId>,
     JpaSpecificationExecutor<RecipeIngredientEntity>{
     fun findByRecipeId(recipeId: Int): List<RecipeIngredientEntity>
 }

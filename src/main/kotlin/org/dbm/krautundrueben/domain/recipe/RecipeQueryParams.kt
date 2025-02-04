@@ -10,9 +10,9 @@ data class RecipeQueryParams(
     val netPrice: BigDecimal?,
     val preparationTime: Int?,
     val instructions: String?,
-    val ingredients: RecipeIngredientEntity?,
-    val nutritionalCategories: RecipeNutritionalCategoryEntity?,
-    val allergenRestrictions: RecipeAllergenRestrictionEntity?,
+    val ingredientId: Int?,
+    val nutritionalCategoryId: Int?,
+    val allergenRestrictionId: Int?,
 
     override val offset: Int,
     override val limit: Int,

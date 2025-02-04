@@ -1,7 +1,6 @@
 package org.dbm.krautundrueben.api.admin.dto
 
 import org.dbm.krautundrueben.domain.ingredient.IngredientEntity
-import org.dbm.krautundrueben.domain.supplier.SupplierEntity
 import java.math.BigDecimal
 
 data class IngredientDto(
@@ -13,7 +12,7 @@ data class IngredientDto(
     val calories: Int?,
     val carbohydrates: BigDecimal?,
     val protein: BigDecimal?,
-    val supplier: SupplierEntity?,
+    val supplierId: Int,
 ) {
     companion object {
         fun from(ingredient: IngredientEntity): IngredientDto {
@@ -26,7 +25,7 @@ data class IngredientDto(
                 ingredient.calories,
                 ingredient.carbohydrates,
                 ingredient.protein,
-                ingredient.supplier,
+                ingredient.supplier.id,
             )
         }
     }
