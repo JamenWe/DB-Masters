@@ -2,6 +2,10 @@ package org.dbm.krautundrueben.api.admin
 
 import jakarta.transaction.Transactional
 import org.dbm.krautundrueben.api.admin.dto.*
+import org.dbm.krautundrueben.api.admin.dto.ingredient.IngredientCreateRequest
+import org.dbm.krautundrueben.api.admin.dto.ingredient.IngredientDto
+import org.dbm.krautundrueben.api.admin.dto.ingredient.IngredientUpdateRequest
+import org.dbm.krautundrueben.api.admin.dto.ingredient.PaginatedIngredient
 import org.dbm.krautundrueben.domain.ingredient.IngredientQueryParams
 import org.dbm.krautundrueben.domain.ingredient.IngredientService
 import org.dbm.krautundrueben.system.logger

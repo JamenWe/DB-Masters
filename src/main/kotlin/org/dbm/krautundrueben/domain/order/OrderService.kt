@@ -2,9 +2,9 @@ package org.dbm.krautundrueben.domain.order
 
 import jakarta.persistence.criteria.JoinType
 import jakarta.transaction.Transactional
-import org.dbm.krautundrueben.api.admin.dto.OrderIngredientRequest
-import org.dbm.krautundrueben.api.admin.dto.OrderRecipeRequest
-import org.dbm.krautundrueben.api.admin.dto.OrderUpdateRequest
+import org.dbm.krautundrueben.api.admin.dto.order.OrderIngredientRequest
+import org.dbm.krautundrueben.api.admin.dto.order.OrderRecipeRequest
+import org.dbm.krautundrueben.api.admin.dto.order.OrderUpdateRequest
 import org.dbm.krautundrueben.domain.customer.CustomerRepository
 import org.dbm.krautundrueben.domain.ingredient.IngredientEntity
 import org.dbm.krautundrueben.domain.ingredient.IngredientRepository

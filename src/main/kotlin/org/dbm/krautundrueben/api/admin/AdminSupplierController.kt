@@ -2,6 +2,10 @@ package org.dbm.krautundrueben.api.admin
 
 import jakarta.transaction.Transactional
 import org.dbm.krautundrueben.api.admin.dto.*
+import org.dbm.krautundrueben.api.admin.dto.supplier.PaginatedSupplier
+import org.dbm.krautundrueben.api.admin.dto.supplier.SupplierCreateRequest
+import org.dbm.krautundrueben.api.admin.dto.supplier.SupplierDto
+import org.dbm.krautundrueben.api.admin.dto.supplier.SupplierUpdateRequest
 import org.dbm.krautundrueben.domain.supplier.SupplierQueryParams
 import org.dbm.krautundrueben.domain.supplier.SupplierService
 import org.dbm.krautundrueben.system.logger

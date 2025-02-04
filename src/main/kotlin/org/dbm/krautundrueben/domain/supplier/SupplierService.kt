@@ -1,7 +1,7 @@
 package org.dbm.krautundrueben.domain.supplier
 
 import jakarta.transaction.Transactional
-import org.dbm.krautundrueben.api.admin.dto.SupplierUpdateRequest
+import org.dbm.krautundrueben.api.admin.dto.supplier.SupplierUpdateRequest
 import org.springframework.data.domain.Page
 import org.springframework.data.jpa.domain.Specification
 import org.springframework.stereotype.Service

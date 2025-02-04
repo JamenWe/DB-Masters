@@ -2,6 +2,10 @@ package org.dbm.krautundrueben.api.admin
 
 import jakarta.transaction.Transactional
 import org.dbm.krautundrueben.api.admin.dto.*
+import org.dbm.krautundrueben.api.admin.dto.customer.CustomerCreateRequest
+import org.dbm.krautundrueben.api.admin.dto.customer.CustomerDto
+import org.dbm.krautundrueben.api.admin.dto.customer.CustomerUpdateRequest
+import org.dbm.krautundrueben.api.admin.dto.customer.PaginatedCustomers
 import org.dbm.krautundrueben.domain.customer.CustomerQueryParams
 import org.dbm.krautundrueben.domain.customer.CustomerService
 import org.dbm.krautundrueben.system.logger

@@ -1,7 +1,7 @@
 package org.dbm.krautundrueben.domain.ingredient
 
 import jakarta.transaction.Transactional
-import org.dbm.krautundrueben.api.admin.dto.IngredientUpdateRequest
+import org.dbm.krautundrueben.api.admin.dto.ingredient.IngredientUpdateRequest
 import org.dbm.krautundrueben.domain.supplier.SupplierRepository
 import org.springframework.data.domain.Page
 import org.springframework.data.jpa.domain.Specification

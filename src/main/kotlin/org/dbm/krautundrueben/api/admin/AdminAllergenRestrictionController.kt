@@ -2,6 +2,10 @@ package org.dbm.krautundrueben.api.admin
 
 import jakarta.transaction.Transactional
 import org.dbm.krautundrueben.api.admin.dto.*
+import org.dbm.krautundrueben.api.admin.dto.allergy.AllergenRestrictionCreateRequest
+import org.dbm.krautundrueben.api.admin.dto.allergy.AllergenRestrictionDto
+import org.dbm.krautundrueben.api.admin.dto.allergy.AllergenRestrictionUpdateRequest
+import org.dbm.krautundrueben.api.admin.dto.allergy.PaginatedAllergenRestriction
 import org.dbm.krautundrueben.domain.allergy.AllergenRestrictionQueryParams
 import org.dbm.krautundrueben.domain.allergy.AllergenRestrictionService
 import org.dbm.krautundrueben.system.logger

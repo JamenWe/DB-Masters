@@ -2,7 +2,7 @@ package org.dbm.krautundrueben.domain.allergy
 
 import jakarta.persistence.criteria.JoinType
 import jakarta.transaction.Transactional
-import org.dbm.krautundrueben.api.admin.dto.AllergenRestrictionUpdateRequest
+import org.dbm.krautundrueben.api.admin.dto.allergy.AllergenRestrictionUpdateRequest
 import org.dbm.krautundrueben.domain.recipe.RecipeAllergenRestrictionEntity
 import org.springframework.data.domain.Page
 import org.springframework.data.jpa.domain.Specification

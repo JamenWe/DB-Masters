@@ -2,7 +2,7 @@ package org.dbm.krautundrueben.domain.recipe
 
 import jakarta.persistence.criteria.JoinType
 import jakarta.transaction.Transactional
-import org.dbm.krautundrueben.api.admin.dto.RecipeUpdateRequest
+import org.dbm.krautundrueben.api.admin.dto.recipe.RecipeUpdateRequest
 import org.dbm.krautundrueben.domain.allergy.AllergenRestrictionEntity
 import org.dbm.krautundrueben.domain.allergy.AllergenRestrictionRepository
 import org.dbm.krautundrueben.domain.ingredient.IngredientEntity

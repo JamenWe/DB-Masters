@@ -2,7 +2,7 @@ package org.dbm.krautundrueben.domain.nutrition
 
 import jakarta.persistence.criteria.JoinType
 import jakarta.transaction.Transactional
-import org.dbm.krautundrueben.api.admin.dto.NutritionalCategoryUpdateRequest
+import org.dbm.krautundrueben.api.admin.dto.nutrition.NutritionalCategoryUpdateRequest
 import org.dbm.krautundrueben.domain.recipe.RecipeNutritionalCategoryEntity
 import org.springframework.data.domain.Page
 import org.springframework.data.jpa.domain.Specification

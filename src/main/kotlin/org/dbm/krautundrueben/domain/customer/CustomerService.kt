@@ -1,7 +1,7 @@
 package org.dbm.krautundrueben.domain.customer
 
 import jakarta.transaction.Transactional
-import org.dbm.krautundrueben.api.admin.dto.CustomerUpdateRequest
+import org.dbm.krautundrueben.api.admin.dto.customer.CustomerUpdateRequest
 import org.springframework.data.domain.Page
 import org.springframework.data.jpa.domain.Specification
 import org.springframework.stereotype.Service

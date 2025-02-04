@@ -2,6 +2,10 @@ package org.dbm.krautundrueben.api.admin
 
 import jakarta.transaction.Transactional
 import org.dbm.krautundrueben.api.admin.dto.*
+import org.dbm.krautundrueben.api.admin.dto.nutrition.NutritionalCategoryCreateRequest
+import org.dbm.krautundrueben.api.admin.dto.nutrition.NutritionalCategoryDto
+import org.dbm.krautundrueben.api.admin.dto.nutrition.NutritionalCategoryUpdateRequest
+import org.dbm.krautundrueben.api.admin.dto.nutrition.PaginatedNutritionalCategory
 import org.dbm.krautundrueben.domain.nutrition.NutritionalCategoryQueryParams
 import org.dbm.krautundrueben.domain.nutrition.NutritionalCategoryService
 import org.dbm.krautundrueben.system.logger
