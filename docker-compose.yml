@@ -1,8 +1,0 @@
-services:
-  db:
-    image: postgres
-    ports:
-      -  "15235:15235"
-    restart: always
-    environment:
-      POSTGRES_PASSWORD: ""

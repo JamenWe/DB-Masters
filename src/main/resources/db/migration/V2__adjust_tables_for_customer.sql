@@ -9,15 +9,15 @@ CREATE TABLE IF NOT EXISTS recipe (
 CREATE TABLE IF NOT EXISTS recipe_ingredient (
     recipe_id INTEGER NOT NULL,
     ingredient_id INTEGER NOT NULL,
-    quantity INTEGER,
+    quantity VARCHAR(50),
     PRIMARY KEY (recipe_id, ingredient_id),
     FOREIGN KEY (recipe_id) REFERENCES recipe (recipe_id),
     FOREIGN KEY (ingredient_id) REFERENCES ingredient (ingredient_id)
 );
 
 CREATE TABLE IF NOT EXISTS order_recipe (
-    recipe_id INTEGER NOT NULL,
     order_id INTEGER NOT NULL,
+    recipe_id INTEGER NOT NULL,
     quantity INTEGER,
     PRIMARY KEY (recipe_id, order_id),
     FOREIGN KEY (order_id) REFERENCES "order" (order_id),
