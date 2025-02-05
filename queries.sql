@@ -171,5 +171,22 @@ FROM recipe
 INNER JOIN recipe_ingredient ON recipe.recipe_id = recipe_ingredient.recipe_id
 INNER JOIN ingredient ON recipe_ingredient.ingredient_id = ingredient.ingredient_id;
 
--- example for right/left join: Get recipes 
 
+-- example for left join: Get all customer_id's and their orders
+SELECT
+    customer.customer_id,
+    "order".order_id
+FROM
+    customer
+LEFT JOIN
+    "order" ON customer.customer_id = "order".customer_id;
+
+
+-- example for right join: Get all recipes and all ingredients, including ingredients not used in any recipe
+SELECT
+    recipe.recipe_name,
+    ingredient.ingredient_name
+FROM
+    recipe_ingredient
+RIGHT JOIN recipe ON recipe_ingredient.recipe_id = recipe.recipe_id
+RIGHT JOIN ingredient ON recipe_ingredient.ingredient_id = ingredient.ingredient_id;
