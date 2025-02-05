@@ -20,7 +20,7 @@ WHERE
     nutritional_category.name = 'Vegetarian';
 
 
--- Get all the recipes that include a ingredient ( parsing ingredient name )
+-- Get all the recipes that include an ingredient ( parsing ingredient name )
 SELECT
     recipe.recipe_name
 FROM
@@ -31,17 +31,19 @@ WHERE
     ingredient.ingredient_name = 'Potato';
 
 
--- Get the avrage nutritional values of the recipes of a order
+-- Get average nutritional values of all orders of one customer
 SELECT
     AVG(ingredient.calories) AS avg_calories,
     AVG(ingredient.carbohydrates) AS avg_carbohydrates,
     AVG(ingredient.protein) AS avg_protein
 FROM
-    order_recipe
+    "order"
+    JOIN order_recipe ON "order".order_id = order_recipe.order_id
     JOIN recipe_ingredient ON order_recipe.recipe_id = recipe_ingredient.recipe_id
     JOIN ingredient ON recipe_ingredient.ingredient_id = ingredient.ingredient_id
 WHERE
-    order_recipe.order_id = 41;
+    "order".customer_id = 9;
+
 
 -- Get all the ingredients that are not found in a recipe yet
 SELECT ingredient_name
@@ -52,7 +54,7 @@ WHERE ingredient_id NOT IN (
 );
 
 
--- Get all recipes that have over 1000 calories
+-- Get all recipes that that do not exceed 2000 calories
 SELECT
     recipe.recipe_id,
     recipe.recipe_name,
@@ -65,12 +67,12 @@ GROUP BY
     recipe.recipe_id,
     recipe.recipe_name
 HAVING
-    SUM(ingredient.calories) > 1000
+    SUM(ingredient.calories) < 2000
 ORDER BY
     recipe.recipe_id;
 
 
--- Get all recipes with less than 5 ingredients
+-- Get all recipes with less than 10 ingredients (we don't have recipes with less than 5 ingredients)
 SELECT
     recipe.recipe_id,
     recipe.recipe_name,
@@ -82,12 +84,12 @@ GROUP BY
     recipe.recipe_id,
     recipe.recipe_name
 HAVING
-    COUNT(recipe_ingredient.ingredient_id) < 5
+    COUNT(recipe_ingredient.ingredient_id) < 10
 ORDER BY
     recipe.recipe_id;
 
 
---Get all recipes with less than 10 ingredients and a certain nutritional category (we have to get it with less then 5)
+--Get all recipes with less than 10 ingredients and a certain nutritional category (we don't have recipes with less than 5 ingredients)
 SELECT
     recipe.recipe_id,
     recipe.recipe_name,
@@ -111,7 +113,7 @@ ORDER BY
 -- 3 EXTRA QUERIES 
 
 
--- Get all recipes fitting to a alleric restriction
+-- Get all recipes fitting to an allergic restriction
 SELECT
     recipe.recipe_id,
     recipe.recipe_name
@@ -125,7 +127,7 @@ WHERE
     allergen_restriction.name = 'Lactose';
 
 
--- Get all orders which recipes over 500 calories 
+-- Get all orders with recipes over 500 calories 
 SELECT 
     order.order_id,
     order.order_date,
@@ -162,7 +164,8 @@ JOIN
 WHERE
     supplier.supplier_name = 'Henning Dairy';
 
--- example inner join: Get all recipes with their ingredients 
+
+-- example inner join: Get all recipes with their ingredients
 SELECT recipe.recipe_name, ingredient.ingredient_name
 FROM recipe
 INNER JOIN recipe_ingredient ON recipe.recipe_id = recipe_ingredient.recipe_id
