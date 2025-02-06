@@ -32,6 +32,7 @@ WHERE
 
 
 -- Get average nutritional values of all orders of one customer
+-- Example for aggregate function
 SELECT
     AVG(ingredient.calories) AS avg_calories,
     AVG(ingredient.carbohydrates) AS avg_carbohydrates,
@@ -46,6 +47,7 @@ WHERE
 
 
 -- Get all the ingredients that are not found in a recipe yet
+-- Example for subquery
 SELECT ingredient_name
 FROM ingredient
 WHERE ingredient_id NOT IN (
