@@ -13,7 +13,7 @@ data class IngredientQueryParams(
     val calories: Int?,
     val carbohydrates: BigDecimal?,
     val protein: BigDecimal?,
-    val supplierId: Int?,
+    val supplierName: String?,
 
     override val offset: Int,
     override val limit: Int,

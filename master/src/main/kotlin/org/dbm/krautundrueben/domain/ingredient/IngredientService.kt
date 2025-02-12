@@ -1,7 +1,9 @@
 package org.dbm.krautundrueben.domain.ingredient
 
+import jakarta.persistence.criteria.JoinType
 import jakarta.transaction.Transactional
 import org.dbm.krautundrueben.api.admin.dto.ingredient.IngredientUpdateRequest
+import org.dbm.krautundrueben.domain.supplier.SupplierEntity
 import org.dbm.krautundrueben.domain.supplier.SupplierRepository
 import org.springframework.data.domain.Page
 import org.springframework.data.jpa.domain.Specification
@@ -116,8 +118,8 @@ class IngredientService(
         if (params.protein != null) {
             specifications.add(proteinEquals(params.protein))
         }
-        if (params.supplierId != null) {
-            specifications.add(supplierIdEquals(params.supplierId))
+        if (!params.supplierName.isNullOrBlank()) {
+            specifications.add(supplierNameLike(params.supplierName))
         }
 
         return Specification.allOf(specifications).and(CriteriaUtil.distinct())
@@ -173,10 +175,11 @@ class IngredientService(
         }
     }
 
-    private fun supplierIdEquals(supplierId: Int): Specification<IngredientEntity> {
+    private fun supplierNameLike(name: String): Specification<IngredientEntity> {
         return Specification { root, _, builder ->
-            val supplier = root.get(IngredientEntity_.supplier)
-            builder.equal(supplier.get<Int>("id"), supplierId)
+            val join = root.join<IngredientEntity, SupplierEntity>("supplier", JoinType.LEFT)
+            val supplierName = builder.lower(join.get("name"))
+            builder.like(supplierName, "%${name.lowercase()}%")
         }
     }
 }

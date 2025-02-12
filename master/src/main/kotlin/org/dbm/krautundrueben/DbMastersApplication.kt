@@ -22,7 +22,7 @@ class DataSourceConnectivityTester {
     fun testDataSource(dataSource: DataSource) = CommandLineRunner {
         try {
             dataSource.connection.use { connection ->
-                if (connection.isValid(2)) { // 2 seconds timeout
+                if (connection.isValid(2)) {
                     logger().info("Successfully established a connection to the database ${dataSource.connection.catalog}.")
                 } else {
                     logger().warn("Failed to validate the database connection.")

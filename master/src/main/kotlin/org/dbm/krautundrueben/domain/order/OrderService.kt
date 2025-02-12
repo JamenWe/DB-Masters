@@ -2,6 +2,7 @@ package org.dbm.krautundrueben.domain.order
 
 import jakarta.persistence.criteria.JoinType
 import jakarta.transaction.Transactional
+import org.dbm.krautundrueben.api.admin.dto.order.CustomerOrderDto
 import org.dbm.krautundrueben.api.admin.dto.order.OrderIngredientRequest
 import org.dbm.krautundrueben.api.admin.dto.order.OrderRecipeRequest
 import org.dbm.krautundrueben.api.admin.dto.order.OrderUpdateRequest
@@ -31,6 +32,18 @@ class OrderService(
 
     fun findById(id: Int): OrderEntity? {
         return orderRepository.findById(id).getOrNull()
+    }
+
+    fun getCustomerOrders(customerId: Int): List<CustomerOrderDto> {
+        return orderRepository.getCustomerOrders(customerId).map { projection ->
+            CustomerOrderDto(
+                orderId = projection.orderId,
+                orderDate = projection.orderDate,
+                invoiceAmount = projection.invoiceAmount,
+                recipes = projection.recipes,
+                ingredients = projection.ingredients
+            )
+        }
     }
 
     @Transactional

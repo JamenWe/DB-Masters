@@ -1,13 +1,15 @@
 package org.dbm.krautundrueben.api.admin
 
 import jakarta.transaction.Transactional
-import org.dbm.krautundrueben.api.admin.dto.*
+import org.dbm.krautundrueben.api.admin.dto.PageData
 import org.dbm.krautundrueben.api.admin.dto.customer.CustomerCreateRequest
 import org.dbm.krautundrueben.api.admin.dto.customer.CustomerDto
 import org.dbm.krautundrueben.api.admin.dto.customer.CustomerUpdateRequest
 import org.dbm.krautundrueben.api.admin.dto.customer.PaginatedCustomers
+import org.dbm.krautundrueben.api.admin.dto.order.CustomerOrderDto
 import org.dbm.krautundrueben.domain.customer.CustomerQueryParams
 import org.dbm.krautundrueben.domain.customer.CustomerService
+import org.dbm.krautundrueben.domain.order.OrderService
 import org.dbm.krautundrueben.system.logger
 import org.springframework.data.domain.Sort
 import org.springframework.http.HttpStatus
@@ -23,13 +25,20 @@ import java.time.LocalDate
     produces = [MediaType.APPLICATION_JSON_VALUE]
 )
 class CustomerController(
-    private val customerService: CustomerService
+    private val customerService: CustomerService,
+    private val orderService: OrderService
 ) {
     @GetMapping("/{id}")
     @Transactional
     fun getCustomer(@PathVariable id: Int): ResponseEntity<CustomerDto> {
         val customer = customerService.findById(id) ?: throw NotFoundException("Customer with ID $id not found.")
         return ResponseEntity.ok(CustomerDto.from(customer))
+    }
+
+    @GetMapping("/{id}/orders")
+    @Transactional
+    fun getCustomerOrders(@PathVariable id: Int): ResponseEntity<List<CustomerOrderDto>> {
+        return ResponseEntity.ok(orderService.getCustomerOrders(id))
     }
 
     @GetMapping
@@ -47,8 +56,8 @@ class CustomerController(
         @RequestParam(required = false) email: String?,
         @RequestParam(defaultValue = "0") offset: Int,
         @RequestParam(defaultValue = "50") limit: Int,
-        @RequestParam(defaultValue = "DESC") sortDir: Sort.Direction,
-        @RequestParam(required = false) sortField: String?
+        @RequestParam(defaultValue = "DESC") sortDir: String,
+        @RequestParam(required = false) sortField: String?,
     ): PaginatedCustomers {
         val params = CustomerQueryParams(
             id,
@@ -63,7 +72,7 @@ class CustomerController(
             email,
             offset,
             limit,
-            sortDir,
+            Sort.Direction.valueOf(sortDir.uppercase()),
             sortField,
         )
 

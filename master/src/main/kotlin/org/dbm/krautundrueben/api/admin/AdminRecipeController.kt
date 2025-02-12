@@ -1,7 +1,7 @@
 package org.dbm.krautundrueben.api.admin
 
 import jakarta.transaction.Transactional
-import org.dbm.krautundrueben.api.admin.dto.*
+import org.dbm.krautundrueben.api.admin.dto.PageData
 import org.dbm.krautundrueben.api.admin.dto.recipe.RecipeCreateRequest
 import org.dbm.krautundrueben.api.admin.dto.recipe.RecipeDto
 import org.dbm.krautundrueben.api.admin.dto.recipe.RecipeUpdateRequest
@@ -41,11 +41,11 @@ class RecipeController(
         @RequestParam(required = false) preparationTime: Int?,
         @RequestParam(required = false) instructions: String?,
         @RequestParam(required = false) ingredientId: Int?,
-        @RequestParam(required = false) nutritionalCategoryId: Int?,
-        @RequestParam(required = false) allergenRestrictionId: Int?,
+        @RequestParam(required = false) nutritionalCategoryName: String?,
+        @RequestParam(required = false) allergenRestrictionName: String?,
         @RequestParam(defaultValue = "0") offset: Int,
         @RequestParam(defaultValue = "50") limit: Int,
-        @RequestParam(defaultValue = "DESC") sortDir: Sort.Direction,
+        @RequestParam(defaultValue = "DESC") sortDir: String,
         @RequestParam(required = false) sortField: String?
     ): PaginatedRecipe {
         val params = RecipeQueryParams(
@@ -55,11 +55,11 @@ class RecipeController(
             preparationTime,
             instructions,
             ingredientId,
-            nutritionalCategoryId,
-            allergenRestrictionId,
+            nutritionalCategoryName,
+            allergenRestrictionName,
             offset,
             limit,
-            sortDir,
+            Sort.Direction.valueOf(sortDir.uppercase()),
             sortField
         )
 

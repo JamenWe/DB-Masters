@@ -207,11 +207,11 @@ class RecipeService(
         if (params.ingredientId != null) {
             specifications.add(hasIngredient(params.ingredientId))
         }
-        if (params.nutritionalCategoryId != null) {
-            specifications.add(hasNutritionalCategory(params.nutritionalCategoryId))
+        if (!params.nutritionalCategoryName.isNullOrBlank()) {
+            specifications.add(hasNutritionalCategoryWithName(params.nutritionalCategoryName))
         }
-        if (params.allergenRestrictionId != null) {
-            specifications.add(hasAllergenRestriction(params.allergenRestrictionId))
+        if (!params.allergenRestrictionName.isNullOrBlank()) {
+            specifications.add(hasAllergenRestrictionWithName(params.allergenRestrictionName))
         }
 
         return Specification.allOf(specifications).and(CriteriaUtil.distinct())
@@ -256,17 +256,34 @@ class RecipeService(
         }
     }
 
-    private fun hasNutritionalCategory(categoryId: Int): Specification<RecipeEntity> {
+    private fun hasNutritionalCategoryWithName(name: String): Specification<RecipeEntity> {
         return Specification { root, _, builder ->
-            val join = root.join<RecipeEntity, RecipeNutritionalCategoryEntity>("recipeNutritionalCategories", JoinType.LEFT)
-            builder.equal(join.get<NutritionalCategoryEntity>("nutritionalCategory").get<Int>("id"), categoryId)
+            val joinRecipeCategory = root.join<RecipeEntity, RecipeNutritionalCategoryEntity>(
+                "recipeNutritionalCategories",
+                JoinType.LEFT
+            )
+            val categoryName = builder.lower(
+                joinRecipeCategory
+                    .get<NutritionalCategoryEntity>("nutritionalCategory")
+                    .get<String>("name")
+            )
+            builder.like(categoryName, "%${name.lowercase()}%")
         }
     }
 
-    private fun hasAllergenRestriction(restrictionId: Int): Specification<RecipeEntity> {
+    private fun hasAllergenRestrictionWithName(name: String): Specification<RecipeEntity> {
         return Specification { root, _, builder ->
-            val join = root.join<RecipeEntity, RecipeAllergenRestrictionEntity>("recipeAllergenRestrictions", JoinType.LEFT)
-            builder.equal(join.get<AllergenRestrictionEntity>("allergenRestriction").get<Int>("id"), restrictionId)
+            val joinRecipeRestriction = root.join<RecipeEntity, RecipeAllergenRestrictionEntity>(
+                "recipeAllergenRestrictions",
+                JoinType.LEFT
+            )
+            val restrictionName = builder.lower(
+                joinRecipeRestriction
+                    .get<AllergenRestrictionEntity>("allergenRestriction")
+                    .get<String>("name")
+            )
+            builder.like(restrictionName, "%${name.lowercase()}%")
         }
     }
+
 }

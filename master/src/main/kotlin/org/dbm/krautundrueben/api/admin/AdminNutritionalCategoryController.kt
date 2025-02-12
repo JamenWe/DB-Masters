@@ -1,7 +1,7 @@
 package org.dbm.krautundrueben.api.admin
 
 import jakarta.transaction.Transactional
-import org.dbm.krautundrueben.api.admin.dto.*
+import org.dbm.krautundrueben.api.admin.dto.PageData
 import org.dbm.krautundrueben.api.admin.dto.nutrition.NutritionalCategoryCreateRequest
 import org.dbm.krautundrueben.api.admin.dto.nutrition.NutritionalCategoryDto
 import org.dbm.krautundrueben.api.admin.dto.nutrition.NutritionalCategoryUpdateRequest
@@ -18,7 +18,7 @@ import system.NotFoundException
 
 @RestController
 @RequestMapping(
-    path = ["/internal/nutritional-categories"],
+    path = ["/internal/nutrition"],
     produces = [MediaType.APPLICATION_JSON_VALUE]
 )
 class NutritionalCategoryController(
@@ -41,7 +41,7 @@ class NutritionalCategoryController(
         @RequestParam(required = false) recipeId: Int?,
         @RequestParam(defaultValue = "0") offset: Int,
         @RequestParam(defaultValue = "50") limit: Int,
-        @RequestParam(defaultValue = "DESC") sortDir: Sort.Direction,
+        @RequestParam(defaultValue = "DESC") sortDir: String,
         @RequestParam(required = false) sortField: String?
     ): PaginatedNutritionalCategory {
         val params = NutritionalCategoryQueryParams(
@@ -50,7 +50,7 @@ class NutritionalCategoryController(
             recipeId,
             offset,
             limit,
-            sortDir,
+            Sort.Direction.valueOf(sortDir.uppercase()),
             sortField
         )
 

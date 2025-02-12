@@ -11,8 +11,8 @@ data class RecipeQueryParams(
     val preparationTime: Int?,
     val instructions: String?,
     val ingredientId: Int?,
-    val nutritionalCategoryId: Int?,
-    val allergenRestrictionId: Int?,
+    val nutritionalCategoryName: String?,
+    val allergenRestrictionName: String?,
 
     override val offset: Int,
     override val limit: Int,

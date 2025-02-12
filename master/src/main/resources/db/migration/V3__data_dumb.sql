@@ -47,7 +47,8 @@ INSERT INTO customer (last_name, first_name, date_of_birth, street, house_number
 INSERT INTO supplier (supplier_name, street, house_number, zip_code, city, phone, email) VALUES
 ('Bio Farm Mueller', 'Dorfstrasse', '74', '24354', 'Weseby', '04354-9080', 'mueller@biohof.de'),
 ('Old Country Fruit Farm', 'Westerjork 74', '76', '21635', 'Jork', '04162-4523', 'info@biohof-altesland.de'),
-('Henning Dairy', 'Dairy Road Customer', '13', '19217', 'Dechow', '038873-8976', 'info@molkerei-henning.de');
+('Henning Dairy', 'Dairy Road Customer', '13', '19217', 'Dechow', '038873-8976', 'info@molkerei-henning.de'),
+( 'BioMarkt', 'Naturstrasse', '15', '10115', 'Berlin', '030-1234567', 'info@biomarkt-fresh.de');
 
 INSERT INTO ingredient (ingredient_name, unit, net_price, stock, supplier_id, calories, carbohydrates, protein) VALUES
 ('Zucchini', 'Piece', 0.89, 100, 1, 19, 2.00, 1.60),
@@ -105,7 +106,8 @@ INSERT INTO allergen_restriction (name) VALUES
 ('Wheat'),
 ('Gluten'),
 ('Starch'),
-('Carrot');
+('Carrot'),
+('Egg');
 
 INSERT INTO nutritional_category (name) VALUES
 ('Vegan'),
@@ -172,7 +174,21 @@ INSERT INTO recipe_ingredient (recipe_id, ingredient_id, quantity) VALUES
 (5, 47, 1),
 (5, 48, 1),
 (5, 49, 1),
-(5, 9, 1);
+(5, 9, 1),
+(1, 25, 1),
+(1, 26, 1),
+(1, 27, 1),
+(2, 14, 1),
+(2, 16, 1),
+(2, 29, 1),
+(3, 27, 1),
+(4, 14, 1),
+(4, 16, 1),
+(4, 27, 1),
+(4, 39, 1),
+(5, 27, 1),
+(5, 29, 1),
+(5, 45, 1);
 
 INSERT INTO recipe_nutritional_category (recipe_id, nutritional_category_id) VALUES
 (1, 1),
